@@ -15,7 +15,8 @@ void output(int universe[height][width]);
 char key(int *speed);
 int stop(int old[height][width], int new[height][width]);
 void preview();
-void exitFunc();
+void exit_func();
+void exit_exit();
 
 int main() {
     int delay = max_speed / 2;
@@ -24,60 +25,56 @@ int main() {
     initscr();
     noecho();
     nodelay(stdscr, true);
-    freopen("/dev/tty", "r", stdin);
-    int nuniverse[height][width];
-    preview();
-    char c = ' ';
-    while (c != 'P' && c != 'p' && c != 'Q' && c != 'q') c = getchar();
-    if (c == 'p' || c == 'P') {
-        while (c != 'q' && c != 'Q') {
-            output(universe);
-            printw("current speed: %d", max_speed - delay);
-            refresh();
-            c = key(&delay);
-            usleep(delay * 50000);
-            next_generation(universe, nuniverse);
-            if (stop(universe, nuniverse)) {
-               // output(nuniverse);
-                usleep(3000000);
-                break;
+    if (freopen("/dev/tty", "r", stdin) != NULL) {
+        preview();
+        char c = ' ';
+        while (c != 'P' && c != 'p' && c != 'Q' && c != 'q') c = getchar();
+        if (c == 'p' || c == 'P') {
+            while (c != 'q' && c != 'Q') {
+                int nuniverse[height][width];
+                output(universe);
+                printw("current speed: %d", max_speed - delay);
+                refresh();
+                c = key(&delay);
+                usleep(delay * 50000);
+                next_generation(universe, nuniverse);
+                if (stop(universe, nuniverse)) {
+                    getchar();
+                    exit_func();
+                    usleep(3000000);
+                    break;
+                }
+                copy(nuniverse, universe);
             }
-            copy(nuniverse, universe);
+        } else if (c == 'Q' || c == 'q') {
+            atexit(exit_exit);
         }
-    } else if (c == 'Q' || c == 'q') {
-        atexit(exitFunc);
+        atexit(exit_exit);
     }
-    atexit(exitFunc);
     return 0;
 }
 
-void exitFunc() { endwin(); }
+void exit_exit() { endwin(); }
 
-char key(int *speed) {
+char key(int *delay) {
     char c = getch();
-    if (c == '+' && (*speed) > 1) {
-        (*speed)--;
-    }
-    if (c == '-' && (*speed) < 20) {
-        (*speed)++;
-    }
+    if (c == '+' && (*delay) > 1) (*delay)--;
+
+    if (c == '-' && (*delay) < 20) (*delay)++;
+
     return c;
 }
 
 int stop(int old[height][width], int new[height][width]) {
     int flag = 1;
-    int count = 0;
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if (new[i][j] == 1) {
-                count++;
-            }
             if (new[i][j] != old[i][j]) {
                 flag = 0;
             }
         }
     }
-    return flag || !count;
+    return flag;
 }
 
 void copy(int old[height][width], int new[height][width]) {
@@ -106,7 +103,6 @@ void next_generation(int universe[height][width], int update[height][width]) {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             int a = alive_neighbour(universe, i, j);
-            printw("%d", a);
             if (universe[i][j] == 1) {
                 if (a == 2 || a == 3) update[i][j] = 1;
 
@@ -117,7 +113,6 @@ void next_generation(int universe[height][width], int update[height][width]) {
                 update[i][j] = 0;
             }
         }
-        printw("\n");
     }
 }
 
@@ -141,12 +136,12 @@ void output(int matrix[height][width]) {
         for (int j = 0; j < width; j++) {
             printw("%c", matrix[i][j] == 0 ? ' ' : '#');
         }
-
         printw("\n");
     }
 }
 
 void preview() {
+    clear();
     printw("/-------------------------------------------------------------------------------\\\n");
     printw("|                                                                               |\n");
     printw("|      Game of                                                                  |\n");
@@ -167,6 +162,37 @@ void preview() {
     printw("|      - - to slow down                                                         |\n");
     printw("|                                                                               |\n");
     printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("\\-------------------------------------------------------------------------------/\n");
+    refresh();
+}
+
+void exit_func() {
+    clear();
+    printw("/-------------------------------------------------------------------------------\\\n");
+    printw("|                                                                               |\n");
+    printw("|      x x x       x x x    x       x  x x x x x                                |\n");
+    printw("|    x x x x x   x x x x x  x x   x x  x x x x x                                |\n");
+    printw("|    x x   x x   x x   x x  x x x x x  x x                                      |\n");
+    printw("|    x x         x x   x x  x x x x x  x x x x x                                |\n");
+    printw("|    x x x x x   x x x x x  x x x x x  x x x x x                                |\n");
+    printw("|    x x   x x   x x   x x  x x   x x  x x                                      |\n");
+    printw("|    x x x x x   x x   x x  x x   x x  x x x x x                                |\n");
+    printw("|      x x x     x x   x x  x x   x x  x x x x x                                |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                    x x x    x x   x x  x x x x x    x x x     |\n");
+    printw("|                                  x x x x x  x x   x x  x x x x x  x x x x x   |\n");
+    printw("|                                  x x   x x  x x   x x  x x        x x   x x   |\n");
+    printw("|                                  x x   x x  x x   x x  x x x x x  x x   x x   |\n");
+    printw("|                                  x x   x x  x x   x x  x x x x x  x x x x     |\n");
+    printw("|                                  x x   x x  x x   x x  x x        x x   x x   |\n");
+    printw("|                                  x x x x x  x x x x x  x x x x x  x x   x x   |\n");
+    printw("|                                    x x x      x x x    x x x x x  x x   x x   |\n");
     printw("|                                                                               |\n");
     printw("|                                                                               |\n");
     printw("|                                                                               |\n");
