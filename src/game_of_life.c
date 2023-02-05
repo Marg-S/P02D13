@@ -38,6 +38,8 @@ int main() {
             usleep(delay * 50000);
             next_generation(universe, nuniverse);
             if (stop(universe, nuniverse)) {
+               // output(nuniverse);
+                usleep(3000000);
                 break;
             }
             copy(nuniverse, universe);
