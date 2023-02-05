@@ -12,8 +12,10 @@ void next_generation(int universe[height][width], int update[height][width]);
 int alive_neighbour(int universe[height][width], int row, int column);
 void copy(int old[height][width], int new[height][width]);
 void output(int universe[height][width]);
-void key(int *speed);
+char key(int *speed);
 int stop(int old[height][width], int new[height][width]);
+void preview();
+void exitFunc();
 
 int main() {
     int delay = max_speed / 2;
@@ -24,24 +26,32 @@ int main() {
     nodelay(stdscr, true);
     freopen("/dev/tty", "r", stdin);
     int nuniverse[height][width];
-    while (1) {
-        output(universe);
-
-        printw("current speed: %d", max_speed - delay);
-        refresh();
-        key(&delay);
-        usleep(delay * 50000);
-        next_generation(universe, nuniverse);
-        if (stop(universe, nuniverse)) {
-            break;
+    preview();
+    char c = ' ';
+    while (c != 'P' && c != 'p' && c != 'Q' && c != 'q') c = getchar();
+    if (c == 'p' || c == 'P') {
+        while (c != 'q' && c != 'Q') {
+            output(universe);
+            printw("current speed: %d", max_speed - delay);
+            refresh();
+            c = key(&delay);
+            usleep(delay * 50000);
+            next_generation(universe, nuniverse);
+            if (stop(universe, nuniverse)) {
+                break;
+            }
+            copy(nuniverse, universe);
         }
-        copy(nuniverse, universe);
+    } else if (c == 'Q' || c == 'q') {
+        atexit(exitFunc);
     }
-   // endwin();
+    atexit(exitFunc);
     return 0;
 }
 
-void key(int *speed) {
+void exitFunc() { endwin(); }
+
+char key(int *speed) {
     char c = getch();
     if (c == '+' && (*speed) > 1) {
         (*speed)--;
@@ -49,6 +59,7 @@ void key(int *speed) {
     if (c == '-' && (*speed) < 20) {
         (*speed)++;
     }
+    return c;
 }
 
 int stop(int old[height][width], int new[height][width]) {
@@ -131,4 +142,34 @@ void output(int matrix[height][width]) {
 
         printw("\n");
     }
+}
+
+void preview() {
+    printw("/-------------------------------------------------------------------------------\\\n");
+    printw("|                                                                               |\n");
+    printw("|      Game of                                                                  |\n");
+    printw("|                                                                               |\n");
+    printw("|      x x         x x   x x x x x   x x x x x                                  |\n");
+    printw("|      x x         x x   x x x x x   x x x x x                                  |\n");
+    printw("|      x x               x x         x x                                        |\n");
+    printw("|      x x         x x   x x x x x   x x x x x                                  |\n");
+    printw("|      x x         x x   x x x x x   x x x x x                                  |\n");
+    printw("|      x x         x x   x x         x x                                        |\n");
+    printw("|      x x x x x   x x   x x         x x x x x                                  |\n");
+    printw("|      x x x x x   x x   x x         x x x x x                                  |\n");
+    printw("|                                                                               |\n");
+    printw("|      Press:                                                                   |\n");
+    printw("|      P - to play                                                              |\n");
+    printw("|      Q - to quit                                                              |\n");
+    printw("|      + - to speed up                                                          |\n");
+    printw("|      - - to slow down                                                         |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("|                                                                               |\n");
+    printw("\\-------------------------------------------------------------------------------/\n");
+    refresh();
 }
