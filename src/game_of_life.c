@@ -12,7 +12,7 @@ void next_generation(int universe[height][width], int update[height][width]);
 int alive_neighbour(int universe[height][width], int row, int column);
 void copy(int old[height][width], int new[height][width]);
 void output(int universe[height][width]);
-char key(int *speed);
+char key(int *delay);
 int stop(int old[height][width], int new[height][width]);
 void preview();
 void exit_func();
@@ -41,7 +41,7 @@ int main() {
                 if (stop(universe, nuniverse)) {
                     getchar();
                     exit_func();
-                    usleep(3000000);
+                    usleep(2000000);
                     break;
                 }
                 copy(nuniverse, universe);
