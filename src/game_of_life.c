@@ -46,6 +46,8 @@ int main() {
                 }
                 copy(nuniverse, universe);
             }
+            exit_func();
+            usleep(3000000);
         } else if (c == 'Q' || c == 'q') {
             atexit(exit_exit);
         }
